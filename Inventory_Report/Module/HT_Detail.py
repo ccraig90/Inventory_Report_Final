@@ -19,6 +19,7 @@ def HT_Detail_Generate():
 
     Bloomberg_Inventory = Bloomberg_Inventory.reindex(Bloomberg_Inventory['P&L'].abs().sort_values(ascending=False).index)
     Bloomberg_Inventory = Bloomberg_Inventory[['Security','CUSIP','P&L','Book','Position','BBG MTG Position','Cumulative Average C']]
+    #Bloomberg_Inventory.to_excel( 'C:\\Users\\ccraig\\Desktop\\test1.xlsx')
     
 
     HT_Files = input_file.HT_FTP_File_Input('Inv Detail',2)
@@ -43,6 +44,7 @@ def HT_Detail_Generate():
     HT_Merged['Requirement Change'] = HT_Merged['Requirement_x']-HT_Merged['Requirement_y']
     HT_Merged.reset_index(inplace = True)
     HT_Merged['CUSIP'] = HT_Merged['CUSIP'].str[:9]
+    
     HT_Merged = pd.merge(HT_Merged,Bloomberg_Inventory,on ='CUSIP',how = 'left')
     # change 9/24/2020 - looking from major HT and BBG DSP
     HT_Merged.fillna(0,inplace = True)
@@ -78,6 +80,8 @@ def HT_Detail_Generate():
         'Req%_x':'Req%'},inplace = True)
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_x']
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_y']
+    HT_Merged.drop_duplicates(subset=['CUSIP','ACCOUNT'],keep='first')
+    
     #HT_Merged.loc[HT_Merged['Account']==0,'Security'] = HT_Merged['Account Name_y']
     HT_Detail = HT_Merged[['Security','CUSIP','Account','Price','BBG QTY','HT QTY','QTY DSP','HT QTY Change','HT Current Unreal PnL','HT Previous Unreal PnL',
                            'Real PnL Change','Adj Unreal PnL Change','BBG PnL','HT-TW PnL DSP','Requirement Change','Current Requirement','Req%']]
@@ -89,7 +93,7 @@ def HT_Detail_Generate():
 
     Requirement_Change = HT_Merged[['Security','CUSIP','Account','Requirement Change']]
     Requirement_Change.drop_duplicates(subset = ['CUSIP'],keep = 'first',inplace = True)
-    HT_Detail.to_excel('test.xlsx')
+    #HT_Detail.to_excel('C:Users/ccraig/Desktop/test.xlsx')
     Requirement_Change = Requirement_Change.reindex(Requirement_Change['Requirement Change'].abs().sort_values(ascending=False).index)
     return HT_Detail,Adj_Unreal_Change,Requirement_Change,Bloomberg_Inventory
      

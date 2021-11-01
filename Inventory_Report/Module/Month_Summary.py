@@ -243,6 +243,7 @@ def Month_Summary():
     Muni_Section.loc['Muni Total'] = Muni_Section.sum(numeric_only = True,axis = 0)
     Muni_Section['Account Name'] = config.Muni_Accounts
     Muni_Section = Muni_Section[['Account Name','Position Type','Market Value','Requirement','Unreal PnL','Real PnL']]
+    Muni_Section.to_excel('C:\\Users\\ccraig\\Desktop\\test12.xlsx')
 
     # -- CMO Section--
  
@@ -868,6 +869,7 @@ def Month_Summary_Daily_Change():
     Old_Muni_Section = Muni_Section[['Account Name','Position Type','Market Value','Requirement','Unreal PnL','Real PnL']]
     Old_Muni_Section.reset_index(inplace = True)
     Old_Muni_Section.reset_index(inplace = True)
+    Old_Muni_Section.to_excel('C:\\Users\\ccraig\\Desktop\\test1.xlsx')
     # -- CMO Section--
  
     K76_Long = Old_File.loc[Old_File['Unique Identifier'] == 'K76 S P IN - Long']
@@ -941,8 +943,10 @@ def Month_Summary_Daily_Change():
     Muni_Section_Daily_Change['Requirement'] = Muni_Section_Daily_Change['Requirement_x'] - Muni_Section_Daily_Change['Requirement_y']  
     Muni_Section_Daily_Change['Unreal PnL'] = Muni_Section_Daily_Change['Unreal PnL_x'] - Muni_Section_Daily_Change['Unreal PnL_y']
     Muni_Section_Daily_Change['Real PnL'] = Muni_Section_Daily_Change['Real PnL_x'] - Muni_Section_Daily_Change['Real PnL_y']
+    #Muni_Section_Daily_Change.to_excel( 'C:\\Users\\ccraig\\Desktop\\test1.xlsx')
     Muni_Section_Daily_Change = Muni_Section_Daily_Change[['Account Name_x','Position Type_x','Market Value','Requirement','Unreal PnL','Real PnL']]
     Muni_Section_Daily_Change.rename(columns={'Account Name_x':'Account Name','Position Type_x':'Position Type'},inplace = True)
+    
 
     CMO_Section_Daily_Change = pd.merge(New_CMO_Section,Old_CMO_Section,how = 'inner',on = 'Account Name')
     CMO_Section_Daily_Change['Market Value'] = CMO_Section_Daily_Change['Market Value_x'] - CMO_Section_Daily_Change['Market Value_y']
