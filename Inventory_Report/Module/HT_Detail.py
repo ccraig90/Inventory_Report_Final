@@ -80,7 +80,7 @@ def HT_Detail_Generate():
         'Req%_x':'Req%'},inplace = True)
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_x']
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_y']
-    HT_Merged.drop_duplicates(subset=['CUSIP','ACCOUNT'],keep='first')
+    HT_Merged.drop_duplicates(subset=['CUSIP','Account'],keep='first',inplace = True)
     
     #HT_Merged.loc[HT_Merged['Account']==0,'Security'] = HT_Merged['Account Name_y']
     HT_Detail = HT_Merged[['Security','CUSIP','Account','Price','BBG QTY','HT QTY','QTY DSP','HT QTY Change','HT Current Unreal PnL','HT Previous Unreal PnL',
