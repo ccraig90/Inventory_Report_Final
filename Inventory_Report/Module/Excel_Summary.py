@@ -561,7 +561,10 @@ def Excel_Summary():
 
 
 
-    """Format K81"""
+    """Format K
+    
+    
+    """
     worksheet_summary.write_formula('A39','=AM39',format_general)
     worksheet_summary.write_formula('A40','=AM40',format_general)
     worksheet_summary.write('A41','',format_general)

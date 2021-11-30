@@ -19,7 +19,6 @@ def HT_Detail_Generate():
 
     Bloomberg_Inventory = Bloomberg_Inventory.reindex(Bloomberg_Inventory['P&L'].abs().sort_values(ascending=False).index)
     Bloomberg_Inventory = Bloomberg_Inventory[['Security','CUSIP','P&L','Book','Position','BBG MTG Position','Cumulative Average C']]
-    #Bloomberg_Inventory.to_excel( 'C:\\Users\\ccraig\\Desktop\\test1.xlsx')
     
 
     HT_Files = input_file.HT_FTP_File_Input('Inv Detail',2)
@@ -39,13 +38,15 @@ def HT_Detail_Generate():
                                                                    'Price':'mean',
                                                              #      'Account Name':'first',
                                                                    'Req%':'sum'})
-    HT_Merged = pd.merge(HT_Files_Recent,HT_Files_Previous,on = ['CUSIP','Account Name'],how = 'outer')
+    HT_Merged = pd.merge(HT_Files_Recent,HT_Files_Previous,on = ['CUSIP','Account Name'],how = 'left')
+
     HT_Merged.fillna(0,inplace = True)
     HT_Merged['Requirement Change'] = HT_Merged['Requirement_x']-HT_Merged['Requirement_y']
     HT_Merged.reset_index(inplace = True)
     HT_Merged['CUSIP'] = HT_Merged['CUSIP'].str[:9]
-    
-    HT_Merged = pd.merge(HT_Merged,Bloomberg_Inventory,on ='CUSIP',how = 'left')
+    #HT_Merged.to_excel( 'C:\\Users\\ccraig\\Desktop\\testH.xlsx')
+    #Bloomberg_Inventory.to_excel( 'C:\\Users\\ccraig\\Desktop\\testB.xlsx')
+    HT_Merged = pd.merge(HT_Merged,Bloomberg_Inventory,on ='CUSIP',how = 'outer')
     # change 9/24/2020 - looking from major HT and BBG DSP
     HT_Merged.fillna(0,inplace = True)
 
@@ -61,12 +62,14 @@ def HT_Detail_Generate():
 
   
     HT_Merged['HT QTY Change'] = HT_Merged['Quantity_x']-HT_Merged['Quantity_y']
+
     HT_Merged['TW - HT Quantity DSP'] = HT_Merged['Position']-HT_Merged['Quantity_x']
     HT_Merged['Real PnL Change'] = HT_Merged['Real PnL_x']-HT_Merged['Real PnL_y']
     HT_Merged['HT Real PnL Change'] = HT_Merged['Real PnL_x']-HT_Merged['Real PnL_y']
     HT_Merged['Adj Unreal PnL Change'] = HT_Merged['Unreal PnL_x']-HT_Merged['Unreal PnL_y']+HT_Merged['HT Real PnL Change']
     HT_Merged['HT-TW PnL DSP'] = HT_Merged['HT Real PnL Change']-HT_Merged['P&L']
     HT_Merged['Filter Column'] = HT_Merged['TW - HT Quantity DSP'] + HT_Merged['HT QTY Change'] + HT_Merged['Adj Unreal PnL Change'] + HT_Merged['HT-TW PnL DSP'] + HT_Merged['Requirement Change']
+    HT_Merged.drop_duplicates(subset=['CUSIP','Account Name'], keep='first',inplace = True)
     HT_Merged.rename(columns={
         'Price_x':'Price',
         'Position':'BBG QTY',
@@ -80,7 +83,7 @@ def HT_Detail_Generate():
         'Req%_x':'Req%'},inplace = True)
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_x']
     HT_Merged.loc[HT_Merged['Security']==0,'Security'] = HT_Merged['Description_y']
-    HT_Merged.drop_duplicates(subset=['CUSIP','Account'],keep='first',inplace = True)
+    #HT_Merged.to_excel( 'C:\\Users\\ccraig\\Desktop\\test1.xlsx')
     
     #HT_Merged.loc[HT_Merged['Account']==0,'Security'] = HT_Merged['Account Name_y']
     HT_Detail = HT_Merged[['Security','CUSIP','Account','Price','BBG QTY','HT QTY','QTY DSP','HT QTY Change','HT Current Unreal PnL','HT Previous Unreal PnL',
@@ -92,8 +95,6 @@ def HT_Detail_Generate():
     Adj_Unreal_Change = Adj_Unreal_Change.reindex(Adj_Unreal_Change['Adj Unreal PnL Change'].abs().sort_values(ascending=False).index)
 
     Requirement_Change = HT_Merged[['Security','CUSIP','Account','Requirement Change']]
-    Requirement_Change.drop_duplicates(subset = ['CUSIP'],keep = 'first',inplace = True)
-    #HT_Detail.to_excel('C:Users/ccraig/Desktop/test.xlsx')
     Requirement_Change = Requirement_Change.reindex(Requirement_Change['Requirement Change'].abs().sort_values(ascending=False).index)
     return HT_Detail,Adj_Unreal_Change,Requirement_Change,Bloomberg_Inventory
      

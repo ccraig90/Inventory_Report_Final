@@ -18,23 +18,30 @@ def PnL_DSP():
 
 
     HT_Files = input_file.HT_FTP_File_Input('Inv Detail',2)
-    HT_Files_Recent = HT_Files[0].groupby(['CUSIP']).agg({'Quantity':'sum',
+    HT_Files_Recent = HT_Files[0].groupby(['CUSIP','Account Name']).agg({'Quantity':'sum',
                                                                    'Unreal PnL':'sum',
                                                                    'Real PnL':'sum',
                                                                    'Requirement':'sum',
                                                                    'Description':'first',
                                                                    'Price':'mean',
-                                                                   'Account Name':'first'})
-    HT_Files_Previous = HT_Files[1].groupby(['CUSIP']).agg({'Quantity':'sum',
+                                                             #      'Account Name':'first',
+                                                                   'Req%':'sum'})
+    HT_Files_Previous = HT_Files[1].groupby(['CUSIP','Account Name']).agg({'Quantity':'sum',
                                                                    'Unreal PnL':'sum',
                                                                    'Real PnL':'sum',
                                                                    'Requirement':'sum',
                                                                    'Description':'first',
                                                                    'Price':'mean',
-                                                                   'Account Name':'first'})
-    HT_Merged = pd.merge(HT_Files_Recent,HT_Files_Previous,on = 'CUSIP',how = 'left')
+                                                             #      'Account Name':'first',
+                                                                   'Req%':'sum'})
+    HT_Files_Recent.to_excel( 'C:\\Users\\ccraig\\Desktop\\Recent.xlsx')
+    HT_Files_Previous.to_excel( 'C:\\Users\\ccraig\\Desktop\\previous.xlsx')
+
+    HT_Merged = pd.merge(HT_Files_Recent,HT_Files_Previous,on = ['CUSIP','Account Name'],how = 'left')
     HT_Merged.reset_index(inplace = True)
     HT_Merged['CUSIP'] = HT_Merged['CUSIP'].str[:9]
+    #HT_Merged.to_excel( 'C:\\Users\\ccraig\\Desktop\\testH.xlsx')
+    #Bloomberg_Inventory.to_excel( 'C:\\Users\\ccraig\\Desktop\\testB.xlsx')
     HT_Merged = pd.merge(HT_Merged,Bloomberg_Inventory,on ='CUSIP',how = 'left')
     HT_Merged.fillna(0,inplace = True)
     HT_Merged['HT Real PnL Change'] = HT_Merged['Real PnL_x'] - HT_Merged['Real PnL_y']

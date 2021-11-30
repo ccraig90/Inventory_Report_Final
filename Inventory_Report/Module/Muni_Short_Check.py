@@ -33,6 +33,7 @@ def Short_Check():
     K0P61 = (K0P61_Muni['Quantity'].values < 0).any()
     K0P66 = (K0P66_Muni['Quantity'].values < 0).any()
     K0P67 = (K0P67_Muni['Quantity'].values < 0).any()
+    
     Muni_Short_Check = {
         'K72':K72,
         'K78':K78,
